@@ -2,10 +2,9 @@ const express = require("express");
 const { Pool, Client } = require("pg");
 const PORT = 3300;
 const app = express();
+
 //const bodyParser = require('body-parser');
-
 //const urlEncodedBodyParser = bodyParser({"extended": false});
-
 //app.use(bodyParser.urlencoded({"extended": false}));
 //app.use(bodyParser.json());
 
@@ -13,6 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: false
 }));
+app.use(express.static('public'));
+
+// app.get("/",(req, res)=>{
+//     res.redirect("/index.html");
+// });
 
 const client = new Client({
     "user": "postgres",
@@ -29,8 +33,6 @@ console.log("Connection : ", conn);
 if (conn) {
     console.log('database connected ..')
 }
-
-
 class Employee
 {
     constructor(code, name, age){
@@ -61,6 +63,7 @@ app.get("/employees", async (req, res) => {
 })
 
 app.post("/addEmployee", async (req, res) => {
+
     //let code = req.body.code;
     //let name = req.body.name;
     //let age = req.body.age;
