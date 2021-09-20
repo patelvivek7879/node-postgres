@@ -1,7 +1,12 @@
+const { urlencoded } = require("body-parser");
 const express = require("express");
 const { Pool, Client } = require("pg");
-const PORT = 3300;
 const app = express();
+
+
+require('dotenv').config();
+const PORT = process.env.PORT || 3300
+
 
 //const bodyParser = require('body-parser');
 //const urlEncodedBodyParser = bodyParser({"extended": false});
@@ -33,20 +38,19 @@ console.log("Connection : ", conn);
 if (conn) {
     console.log('database connected ..')
 }
-class Employee
-{
-    constructor(code, name, age){
+class Employee {
+    constructor(code, name, age) {
         this.code = code;
         this.name = name;
         this.age = age;
     }
-    getName(){
+    getName() {
         return this.name;
     }
-    getAge(){
+    getAge() {
         return this.age;
     }
-    getCode(){
+    getCode() {
         return this.code;
     }
 }
@@ -61,6 +65,25 @@ app.get("/employees", async (req, res) => {
     console.log(employees);
     res.send(employees);
 })
+
+app.get("/getEmployeeByCode/:id", async (req,res)=>{
+  //  console.log("Request : ", req);
+    let code = req.params.id;
+  //  console.log(code);
+    let result = await client.query(`select * from employee where code=${code}`);
+    console.log(result.rows);
+    res.send(result.rows);
+});
+
+//to handle any unappropriate request
+app.get("*",async (req,res)=>{
+    res.send({
+        "status":{
+            "statusCode": 404,
+            "message": "Page Not Found"
+        } 
+    });
+});
 
 app.post("/addEmployee", async (req, res) => {
 
@@ -97,37 +120,35 @@ app.post("/addEmployee", async (req, res) => {
 });
 
 
-app.post("/updateEmployee",async (req, res)=>{
+app.post("/updateEmployee", async (req, res) => {
     const { ...employee } = req.body;
 
     let result = await client.query(`select * from employee where code=${employee.code}`);
 
-    if(!result.rowCount)
-    {
+    if (!result.rowCount) {
         res.status(400).json("Invalid code, user does not exists.")
     }
-    else{
+    else {
         result = await client.query(`update employee set name='${employee.name}', age=${employee.age} where code = ${employee.code}`);
         console.log(result);
 
         res.json({
-        "success": true,
-        "error": false
-    })
+            "success": true,
+            "error": false
+        })
     }
 });
 
-app.post("/deleteEmployee", async(req, res)=>{
-    const {...employee} = req.body;
+app.post("/deleteEmployee", async (req, res) => {
+    const { ...employee } = req.body;
     let result = client.query(`select code from employee where code=${employee.code}`);
     console.log(result);
-    if(result.rowCount)
-    {
+    if (result.rowCount) {
         res.status(404).json({
             "success": false,
             "message": `emplyee with code ${employee.code} does not exists`
         });
-    }else{
+    } else {
         result = client.query(`delete from employee where code=${employee.code}`);
         res.json({
             "success": true,
@@ -139,3 +160,4 @@ app.post("/deleteEmployee", async(req, res)=>{
 app.listen(PORT, (req, res) => {
     console.log(`Server is listening on port ${PORT}`);
 });
+

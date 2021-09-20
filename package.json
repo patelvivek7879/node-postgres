@@ -1,5 +1,6 @@
 {
   "name": "node-postgres",
+  "home-app": "employees",
   "version": "1.0.0",
   "description": "",
   "main": "eg1.js",
@@ -21,6 +22,7 @@
     "body-parser": "^1.19.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "progress": "^2.0.3"
   }
 }
