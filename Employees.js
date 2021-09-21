@@ -81,17 +81,31 @@ router.get("/getEmployeeByName",async (req, res)=>{
     let result = await client.query(`select * from employee where name='${name}'`);
     result.rows[0].name=result.rows[0].name.trim()
     res.send(result.rows);
-});
+}); 
 
 //to handle any unappropriate request
 router.get("*",async (req,res)=>{
-    res.send({
-        "status":{
-            "statusCode": 404,
-            "message": "Page Not Found"
+  res.redirect("/error.html");
+    //res.redirect("back");
+    //res.redirect('..');
+});
+
+router.get("/",(req, res)=>{
+    var options = {
+        root: path.join(__dirname)
+    };
+
+    let fileName = "time1.js";
+    console.log('GETTING A FILE >>>>>>')
+    res.sendFile(fileName, options, function (err) {
+        if (err) {
+            next(err);
+        } else {
+            console.log('Sent:', fileName);
         }
     });
 });
+
 router.post("/addEmployee", async (req, res) => {
 
     //let code = req.body.code;
