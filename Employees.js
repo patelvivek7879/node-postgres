@@ -1,23 +1,18 @@
-const { urlencoded } = require("body-parser");
+// const { Client } = require("pg");
 const express = require("express");
-const { Pool, Client } = require("pg");
-const app = express();
-
-
-require('dotenv').config();
-const PORT = process.env.PORT || 3300
-
+const router = express.Router();
+const { Client } = require('pg');
 
 //const bodyParser = require('body-parser');
 //const urlEncodedBodyParser = bodyParser({"extended": false});
 //app.use(bodyParser.urlencoded({"extended": false}));
 //app.use(bodyParser.json());
 
-app.use(express.json());
-app.use(express.urlencoded({
-    extended: false
-}));
-app.use(express.static('public'));
+// app.use(express.json());
+// app.use(express.urlencoded({
+//     extended: false
+// }));
+//app.use(express.static('public'));
 
 // app.get("/",(req, res)=>{
 //     res.redirect("/index.html");
@@ -38,6 +33,7 @@ console.log("Connection : ", conn);
 if (conn) {
     console.log('database connected ..')
 }
+
 class Employee {
     constructor(code, name, age) {
         this.code = code;
@@ -55,8 +51,10 @@ class Employee {
     }
 }
 
+router.get("/employees", async (req, res) => {
+    
+    console.log("Base URL : ", req.baseUrl);
 
-app.get("/employees", async (req, res) => {
     var employees = [];
     let result = await client.query("select * from employee");
     result.rows.forEach((row) => {
@@ -66,26 +64,26 @@ app.get("/employees", async (req, res) => {
     res.send(employees);
 })
 
-app.get("/getEmployeeByCode/:id", async (req,res)=>{
-  //  console.log("Request : ", req);
+router.get("/getEmployeeByCode/:id", async (req,res)=>{
     let code = req.params.id;
-  //  console.log(code);
+    console.log(req.params);
     let result = await client.query(`select * from employee where code=${code}`);
-    console.log(result.rows);
+    result.rows[0].name = result.rows[0].name.trim();
     res.send(result.rows);
+    console.log(result.rows)
 });
 
+
 //to handle any unappropriate request
-app.get("*",async (req,res)=>{
+router.get("*",async (req,res)=>{
     res.send({
         "status":{
             "statusCode": 404,
             "message": "Page Not Found"
-        } 
+        }
     });
 });
-
-app.post("/addEmployee", async (req, res) => {
+router.post("/addEmployee", async (req, res) => {
 
     //let code = req.body.code;
     //let name = req.body.name;
@@ -120,7 +118,7 @@ app.post("/addEmployee", async (req, res) => {
 });
 
 
-app.post("/updateEmployee", async (req, res) => {
+router.post("/updateEmployee", async (req, res) => {
     const { ...employee } = req.body;
 
     let result = await client.query(`select * from employee where code=${employee.code}`);
@@ -138,8 +136,7 @@ app.post("/updateEmployee", async (req, res) => {
         })
     }
 });
-
-app.post("/deleteEmployee", async (req, res) => {
+router.post("/deleteEmployee", async (req, res) => {
     const { ...employee } = req.body;
     let result = client.query(`select code from employee where code=${employee.code}`);
     console.log(result);
@@ -157,7 +154,5 @@ app.post("/deleteEmployee", async (req, res) => {
     }
 });
 
-app.listen(PORT, (req, res) => {
-    console.log(`Server is listening on port ${PORT}`);
-});
 
+module.exports = router;
