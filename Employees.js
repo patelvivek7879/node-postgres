@@ -3,6 +3,9 @@ const express = require("express");
 const router = express.Router();
 const { Client } = require('pg');
 
+// const url = require('url');
+// const queryString = require('querystring');
+
 //const bodyParser = require('body-parser');
 //const urlEncodedBodyParser = bodyParser({"extended": false});
 //app.use(bodyParser.urlencoded({"extended": false}));
@@ -69,10 +72,16 @@ router.get("/getEmployeeByCode/:id", async (req,res)=>{
     console.log(req.params);
     let result = await client.query(`select * from employee where code=${code}`);
     result.rows[0].name = result.rows[0].name.trim();
-    res.send(result.rows);
     console.log(result.rows)
 });
 
+router.get("/getEmployeeByName",async (req, res)=>{
+    let name = req.query.name;
+    console.log(name);
+    let result = await client.query(`select * from employee where name='${name}'`);
+    result.rows[0].name=result.rows[0].name.trim()
+    res.send(result.rows);
+});
 
 //to handle any unappropriate request
 router.get("*",async (req,res)=>{
