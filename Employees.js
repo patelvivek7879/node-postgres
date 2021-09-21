@@ -71,16 +71,32 @@ router.get("/getEmployeeByCode/:id", async (req,res)=>{
     let code = req.params.id;
     console.log(req.params);
     let result = await client.query(`select * from employee where code=${code}`);
+    if(result.rows.length < 1){
+        res.status(404).send({
+            success: false,
+            message: "Employee not found"
+        })
+    }else if(result){
     result.rows[0].name = result.rows[0].name.trim();
     console.log(result.rows)
+    res.send(result.rows[0]);
+    }
 });
 
 router.get("/getEmployeeByName",async (req, res)=>{
     let name = req.query.name;
     console.log(name);
     let result = await client.query(`select * from employee where name='${name}'`);
+    if(result.rows.length < 1){
+        res.status(404).send({
+            success: false,
+            message: "Employee not found"
+        });
+    }
+    else if(result){
     result.rows[0].name=result.rows[0].name.trim()
     res.send(result.rows);
+    }
 }); 
 
 //to handle any unappropriate request
