@@ -1,4 +1,4 @@
 const electronics = require("electronics");
-const bb = electronics();
+const  bulb = electronics();
 
-console.log(bb.getWattage())
+console.log(bulb.getWattage())
